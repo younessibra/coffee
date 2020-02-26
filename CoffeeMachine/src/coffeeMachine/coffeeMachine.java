@@ -1,5 +1,6 @@
 package coffeeMachine;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class coffeeMachine {
 	private DrinkMaker maker = new DrinkMaker();
@@ -10,7 +11,14 @@ public class coffeeMachine {
         	this.value = value;
         }
     }
-	private HashMap<String, PriceHolder> drinkPrices= new HashMap<String, PriceHolder>();
+    private static class UsageHolder {
+    	public int value;
+    	UsageHolder(int value) {
+        	this.value = value;
+        }
+    }
+	private HashMap<String, PriceHolder> drinkPrices= new HashMap<String, PriceHolder>(); ;
+	private HashMap<String, UsageHolder> drinkUsages= new HashMap<String, UsageHolder>(); ;
 	
 	public coffeeMachine() {
     	drinkTypes.put("T", "tea");
@@ -28,7 +36,14 @@ public class coffeeMachine {
     	drinkPrices.put("extra hot chocolate", new PriceHolder(0.5));
     	drinkPrices.put("extra hot coffee", new PriceHolder(0.6));
     	drinkPrices.put("orange juice", new PriceHolder(0.6));
-    }
+    	drinkUsages.put("tea", new UsageHolder(0));
+    	drinkUsages.put("coffee", new UsageHolder(0));
+    	drinkUsages.put("chocolate", new UsageHolder(0)); 
+    	drinkUsages.put("extra hot tea", new UsageHolder(0)); 
+    	drinkUsages.put("extra hot chocolate", new UsageHolder(0));
+    	drinkUsages.put("extra hot coffee", new UsageHolder(0));
+    	drinkUsages.put("orange juice", new UsageHolder(0));
+	}
 	
 	private void sendCommand(String command, double moneyInserted) {
     	String[] commandArray = command.split(":");
@@ -45,12 +60,27 @@ public class coffeeMachine {
 	        		throw new IllegalArgumentException("Command not in correct format");
 	        	}
 	        	maker.sendCommand(drinkType + " with " + getNumberOfSugar(commandArray[1])+ " and " + isThereAStick(commandArray[2]));
+	        	updateUsageValue(drinkType);
         	}
         	else {
         		maker.sendCommand("Missing " + -moneyMissing + " euros");
         	}
         }
     }
+	private void updateUsageValue(String drinkType) {
+    	if (drinkUsages.containsKey(drinkType)){
+    		int value = drinkUsages.get(drinkType).value;
+        	drinkUsages.put(drinkType, new UsageHolder(value + 1)); 
+    	}
+    	else {
+        	throw new IllegalArgumentException("Command not in correct format");
+    	}
+	}
+	private void getUsageValues() {
+		for (Entry<String, UsageHolder> entry : drinkUsages.entrySet()) {
+			System.out.println(entry.getKey() + " has been used " + entry.getValue().value + " times");
+		}
+	}
     private double moneyMissing(String drinkType, double moneyInserted) {
     	if (drinkPrices.containsKey(drinkType)){
     		return moneyInserted - drinkPrices.get(drinkType).value;
@@ -100,6 +130,8 @@ public class coffeeMachine {
         machine.sendCommand("0:2:0", 0.1);
         machine.sendCommand("0:2:0", 0.6);
         machine.sendCommand("Th:1:0", 0.5);
+        machine.sendCommand("Th:1:0", 0.5);
         machine.sendCommand("M:aaa", 0.5);
+        machine.getUsageValues();
     }
 }
