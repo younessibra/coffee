@@ -16,10 +16,18 @@ public class coffeeMachine {
     	drinkTypes.put("T", "tea");
     	drinkTypes.put("C", "coffee"); 
     	drinkTypes.put("H", "chocolate"); 
-    	drinkTypes.put("M", "message"); 
+    	drinkTypes.put("Th", "extra hot tea"); 
+    	drinkTypes.put("Hh", "extra hot chocolate");
+    	drinkTypes.put("Ch", "extra hot coffee");
+    	drinkTypes.put("0", "orange juice");
+    	drinkTypes.put("M", "message");
     	drinkPrices.put("tea", new PriceHolder(0.4));
     	drinkPrices.put("coffee", new PriceHolder(0.6));
     	drinkPrices.put("chocolate", new PriceHolder(0.5)); 
+    	drinkPrices.put("extra hot tea", new PriceHolder(0.4)); 
+    	drinkPrices.put("extra hot chocolate", new PriceHolder(0.5));
+    	drinkPrices.put("extra hot coffee", new PriceHolder(0.6));
+    	drinkPrices.put("orange juice", new PriceHolder(0.6));
     }
 	
 	private void sendCommand(String command, double moneyInserted) {
@@ -89,7 +97,9 @@ public class coffeeMachine {
         machine.sendCommand("T:1:0", 0.3);
         machine.sendCommand("H:2:0", 1.0);
         machine.sendCommand("H:2:0", 0.1);
-        machine.sendCommand("T:1:0", 0.5);
+        machine.sendCommand("0:2:0", 0.1);
+        machine.sendCommand("0:2:0", 0.6);
+        machine.sendCommand("Th:1:0", 0.5);
         machine.sendCommand("M:aaa", 0.5);
     }
 }
