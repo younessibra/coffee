@@ -4,14 +4,25 @@ import java.util.*;
 public class coffeeMachine {
 	private DrinkMaker maker = new DrinkMaker();
 	private HashMap<String, String> drinkTypes = new HashMap<String, String>(); ;
+    private static class PriceHolder {
+    	public double value;
+    	PriceHolder(double value) {
+        	this.value = value;
+        }
+    }
+	private HashMap<String, PriceHolder> drinkPrices= new HashMap<String, PriceHolder>();
+	
 	public coffeeMachine() {
     	drinkTypes.put("T", "tea");
     	drinkTypes.put("C", "coffee"); 
     	drinkTypes.put("H", "chocolate"); 
-    	drinkTypes.put("M", "message");    	
+    	drinkTypes.put("M", "message"); 
+    	drinkPrices.put("tea", new PriceHolder(0.4));
+    	drinkPrices.put("coffee", new PriceHolder(0.6));
+    	drinkPrices.put("chocolate", new PriceHolder(0.5)); 
     }
 	
-	private void sendCommand(String command) {
+	private void sendCommand(String command, double moneyInserted) {
     	String[] commandArray = command.split(":");
     	if (commandArray.length < 2) {
     		throw new IllegalArgumentException("Command not in correct format");
@@ -20,12 +31,27 @@ public class coffeeMachine {
         if (drinkType == "message") {
         	maker.sendCommand(commandArray[1]);
         } else {
-        	if (commandArray.length < 3) {
-        		throw new IllegalArgumentException("Command not in correct format");
+        	double moneyMissing = moneyMissing(drinkType, moneyInserted);
+        	if (moneyMissing(drinkType, moneyInserted) >= 0) {
+	        	if (commandArray.length < 3) {
+	        		throw new IllegalArgumentException("Command not in correct format");
+	        	}
+	        	maker.sendCommand(drinkType + " with " + getNumberOfSugar(commandArray[1])+ " and " + isThereAStick(commandArray[2]));
         	}
-        	maker.sendCommand(drinkType + " with " + getNumberOfSugar(commandArray[1])+ " and " + isThereAStick(commandArray[2]));
+        	else {
+        		maker.sendCommand("Missing " + -moneyMissing + " euros");
+        	}
         }
     }
+    private double moneyMissing(String drinkType, double moneyInserted) {
+    	if (drinkPrices.containsKey(drinkType)){
+    		return moneyInserted - drinkPrices.get(drinkType).value;
+    	}
+    	else {
+        	throw new IllegalArgumentException("Command not in correct format");
+    	}
+    }
+	
     private String getDrinkType(String type) {
     	if (drinkTypes.containsKey(type)){
     		return drinkTypes.get(type);
@@ -60,8 +86,10 @@ public class coffeeMachine {
     }
     public static void main(String[] args) {
     	coffeeMachine machine = new coffeeMachine();
-        machine.sendCommand("T:1:0");
-        machine.sendCommand("H:2:0");
-        machine.sendCommand("M:aaa");
+        machine.sendCommand("T:1:0", 0.3);
+        machine.sendCommand("H:2:0", 1.0);
+        machine.sendCommand("H:2:0", 0.1);
+        machine.sendCommand("T:1:0", 0.5);
+        machine.sendCommand("M:aaa", 0.5);
     }
 }
